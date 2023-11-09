@@ -9,7 +9,9 @@
     <h1>Second Page</h1>
     <p>This is the second page</p>
     <ul>
-        <li>
+        {% for lead in leads %}
+        <li>{{lead}}</li>     
+        {% endfor %}
     </ul>
 </body>
 </html>
