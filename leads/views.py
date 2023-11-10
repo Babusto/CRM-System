@@ -1,5 +1,8 @@
-from django.shortcuts import render, redirect
+from django.core.mail import send_mail
+from django.forms.models import BaseModelForm
+from django.shortcuts import render, redirect, reverse
 from django.http import HttpResponse
+from django.views.generic import DeleteView, CreateView
 from.models import Lead, Agent
 from .forms import LeadForm, LeadModelForm
 
@@ -19,6 +22,25 @@ def lead_detail(request, pk):
         'lead': lead
     }
     return render(request, "leads/lead_detail.html", context )
+
+class LeadCreateView(CreateView):
+    template_name = "leads/lead_create.html"
+    form_class = LeadModelForm
+
+    def get_success_url(self):
+        return reverse('leads:lead-list')
+    
+    def form_valid(self, form):
+        # TODO send email
+        send_mail(
+            subject = "A lead has been created", 
+            message="Go to the site to see the new lead",
+            from_email="test@test.com",
+            recipient_list=["test2@test.com"]
+        )
+        return super(LeadCreateView, self).form_valid(form)
+    
+
 
 def lead_create(request):
     form = LeadModelForm()
@@ -47,6 +69,14 @@ def lead_update(request, pk):
         }
     return render(request, "leads/lead_update.html", context )
 
+
+class LeadDeleteView(DeleteView):
+    template_name= 'leads/lead_delete.html'
+    queryset = Lead.objects.all()
+
+    def get_success_url(self):
+        return reverse('leads:lead-list')
+    
 
 def lead_delete(request, pk):
     lead = Lead.objects.get(id=pk)
